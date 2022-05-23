@@ -22,6 +22,7 @@ async function run() {
       const productsCollection = client.db("phoneTech").collection("products");
       const orderCollection = client.db("phoneTech").collection("orders");
       const reviewsCollection = client.db("phoneTech").collection("reviews");
+      const profileCollection = client.db("phoneTech").collection("profile");
     
       app.get('/products' , async(req, res)=>{
           const query = {};
@@ -34,19 +35,26 @@ async function run() {
         const result = await orderCollection.insertOne(query);
         res.send(result)
       })
-      app.get('/orders', async(req,res)=>{
+      app.get('/all-orders', async(req,res)=>{
         const query = {}
         const result = await orderCollection.find(query).toArray()
         res.send(result)
       })
 
       app.get('/orders', async(req,res)=>{
-        
+        const customerEmail = req.query.customerEmail;
+         const query = {customerEmail}
         const result = await orderCollection.find(query).toArray()
         res.send(result)
       })
 
-
+      app.delete('/orders/:id' , async(req,res)=>{
+          const id = req.params.id;
+          const query = {_id:ObjectId(id)}
+          const result = await orderCollection.deleteOne(query);
+          res.send(result)
+      })
+    
       app.post('/reviews' , async(req,res)=>{
         const query = req.body;
         const result = await reviewsCollection.insertOne(query);
@@ -55,6 +63,18 @@ async function run() {
       app.get('/reviews', async(req,res)=>{
         const query = {};
         const result = await reviewsCollection.find(query).toArray()
+        res.send(result)
+      })
+
+      app.post('/profile' , async(req , res)=>{
+        const query = req.body;
+        const result = await profileCollection.insertOne(query);
+        res.send(result)
+      })
+      app.get('/profile' , async(req , res)=>{
+        const userEmail = req.query.userEmail;
+        const query = {userEmail}
+        const result = await profileCollection.find(query).toArray();
         res.send(result)
       })
       
