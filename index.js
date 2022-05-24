@@ -6,7 +6,7 @@ require('dotenv').config()
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 const port = process.env.PORT || 5000 ;
-
+const stripe = require('stripe')(process.env.STRIPE_KEY)
 app.use(cors());
 app.use(express.json())
 
@@ -40,6 +40,7 @@ async function run() {
       const reviewsCollection = client.db("phoneTech").collection("reviews");
       const profileCollection = client.db("phoneTech").collection("profile");
       const userCollection = client.db("phoneTech").collection("users");
+      const paymentCollection = client.db("phoneTech").collection("payment");
      
       // get products
       app.get('/products' , async(req, res)=>{
@@ -67,6 +68,14 @@ async function run() {
         const query = {}
         const result = await orderCollection.find(query).toArray()
         res.send(result)
+      })
+
+      app.get('/orders/:id' , verifyToken , async(req, res)=>{
+          const id = req.params.id;
+          const query = {_id:ObjectId(id)}
+          const result = await orderCollection.findOne(query)
+          res.send(result)
+
       })
 
       // get orders by email 
@@ -97,14 +106,30 @@ async function run() {
         const id = req.params.id;
         const query = {_id:ObjectId(id)}
         const orderStatus = req.body.status;
-        console.log(id , query , orderStatus)
         const updateDoc = {
           $set: {
             status : orderStatus
           },
         };
-        console.log(updateDoc , orderStatus , id)
         const result = await orderCollection.updateOne(query, updateDoc);
+        res.send(result)
+      })
+
+      app.patch('/order/:id' , async(req , res)=>{
+        const id = req.params.id;
+        const query = {_id:ObjectId(id)}
+        const paymentBody = req.body;
+        const payment = req.body.payment;
+        const transactionId = req.body.transactionId;
+        const options = { upsert : true};
+        const updateDoc = {
+          $set: {
+            payment : payment,
+            transactionId : transactionId,
+          },
+        };
+        const results = await paymentCollection.insertOne(paymentBody)
+        const result = await orderCollection.updateOne(query, updateDoc , options);
         res.send(result)
       })
     
@@ -144,13 +169,12 @@ async function run() {
       app.put('/users/admin/:email' , verifyToken , async(req , res)=>{
         const email = req.params.email;
         const requester = req.decoded.email
-        console.log(requester)
+       
         const filter = {email : email};
         const updateDocs = {
           $set : {role : 'admin'}
         };
-        const result = await userCollection.updateOne(filter  , updateDocs );
-        console.log(email , filter , updateDocs)
+        const result = await userCollection.updateOne(filter  , updateDocs )
         res.send(result)
       })
 
@@ -181,7 +205,21 @@ async function run() {
       res.send(isAdmin)
     })
 
+    app.post("/create-payment-intent" ,  async (req, res) => {
+      const service = req.body;
+      const amount = service.cost;
       
+      console.log('amount' , amount)
+ 
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount ,
+        currency: "usd",
+        payment_method_types:['card'] 
+      });
+    
+      res.send({clientSecret: paymentIntent.client_secret});
+    });
+
     } finally {
     //   await client.close();
     }
