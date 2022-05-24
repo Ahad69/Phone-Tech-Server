@@ -92,6 +92,21 @@ async function run() {
           const result = await orderCollection.deleteOne(query);
           res.send(result)
       })
+
+      app.put('/order/:id' , async(req , res)=>{
+        const id = req.params.id;
+        const query = {_id:ObjectId(id)}
+        const orderStatus = req.body.status;
+        console.log(id , query , orderStatus)
+        const updateDoc = {
+          $set: {
+            status : orderStatus
+          },
+        };
+        console.log(updateDoc , orderStatus , id)
+        const result = await orderCollection.updateOne(query, updateDoc);
+        res.send(result)
+      })
     
       // post reviews
       app.post('/reviews' , async(req,res)=>{
@@ -165,6 +180,7 @@ async function run() {
       const isAdmin = user.role === 'admin' ;
       res.send(isAdmin)
     })
+
       
     } finally {
     //   await client.close();
