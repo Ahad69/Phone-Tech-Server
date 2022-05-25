@@ -162,7 +162,7 @@ async function run() {
       })
 
       // get profile 
-      app.get('/ahad' , async(req , res)=>{
+      app.get('/profile' , async(req , res)=>{
         const userEmail = req.query.userEmail;
         const query = {userEmail}
         const result = await profileCollection.find(query).toArray();
