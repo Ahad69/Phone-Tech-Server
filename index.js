@@ -162,7 +162,7 @@ async function run() {
       })
 
       // get profile 
-      app.get('/profile' , async(req , res)=>{
+      app.get('/profile' , verifyToken ,  async(req , res)=>{
         const userEmail = req.query.userEmail;
         const query = {userEmail}
         const result = await profileCollection.find(query).toArray();
@@ -176,8 +176,6 @@ async function run() {
       });
       app.put('/users/admin/:email' , verifyToken , async(req , res)=>{
         const email = req.params.email;
-        const requester = req.decoded.email
-       
         const filter = {email : email};
         const updateDocs = {
           $set : {role : 'admin'}
