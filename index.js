@@ -16,22 +16,22 @@ const stripe = require('stripe')(process.env.STRIPE_KEY)
 // app.use(cors(corsConfig))
 // app.options('*', cors(corsConfig))
 
-// app.use(cors())
-// app.use(express.json())
-// app.use('*', cors())
-const corsConfig = {
-  origin: '*',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE']
-}
-app.use(cors(corsConfig))
-app.options("*", cors(corsConfig))
+app.use(cors())
 app.use(express.json())
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept,authorization")
-  next()
-})
+// app.use('*', cors())
+// const corsConfig = {
+//     origin: '*',
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE']
+// }
+// app.use(cors(corsConfig))
+// app.options("*", cors(corsConfig))
+// app.use(express.json())
+// app.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*")
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept,authorization")
+//     next()
+// })
 
 
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.USER_PASS}@cluster0.sbmqf.mongodb.net/?retryWrites=true&w=majority`;
@@ -108,10 +108,10 @@ async function run() {
       })
 
       // get orders by email 
+  
       app.get('/orders', verifyToken , async(req,res)=>{
         const customerEmail = req.query.customerEmail;
          const decodedEmail =  req.decoded.email;
-
          if(customerEmail == decodedEmail){
           const query = {customerEmail}
           const result = await orderCollection.find(query).toArray()
@@ -186,6 +186,7 @@ async function run() {
       app.get('/profile' , verifyToken ,  async(req , res)=>{
         const userEmail = req.query.userEmail;
         const query = {userEmail}
+        console.log(query)
         const result = await profileCollection.find(query).toArray();
         res.send(result)
       })
