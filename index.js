@@ -9,13 +9,13 @@ const port = process.env.PORT || 5000 ;
 const stripe = require('stripe')(process.env.STRIPE_KEY)
 
 
-const corsConfig = {
-  origin: true,
-  credentials: true,
-  }
-
-app.use(cors(corsConfig))
-app.options('*', cors(corsConfig))
+// const corsConfig = {
+//   origin: "http://localhost:3000/",
+//   credentials: true,
+//   }
+// app.use(cors(corsConfig))
+// app.options('*', cors(corsConfig))
+app.use(cors())
 app.use(express.json())
 
 
