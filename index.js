@@ -10,14 +10,15 @@ const stripe = require('stripe')(process.env.STRIPE_KEY)
 
 
 // const corsConfig = {
-//   origin: "http://localhost:3000/",
+//   origin: true ,
 //   credentials: true,
 //   }
 // app.use(cors(corsConfig))
 // app.options('*', cors(corsConfig))
-app.use(cors())
-app.use(express.json())
 
+// app.use(cors())
+app.use(express.json())
+app.use('*', cors())
 
 
 
@@ -86,7 +87,7 @@ async function run() {
         res.send(result)
       })
 
-      app.get('/orders/:id' , verifyToken , async(req, res)=>{
+      app.get('/orders/:id'  , async(req, res)=>{
           const id = req.params.id;
           const query = {_id:ObjectId(id)}
           const result = await orderCollection.findOne(query)
