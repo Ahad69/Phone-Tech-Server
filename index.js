@@ -7,7 +7,15 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 const port = process.env.PORT || 5000 ;
 const stripe = require('stripe')(process.env.STRIPE_KEY)
-app.use(cors());
+
+
+const corsConfig = {
+  origin: true,
+  credentials: true,
+  }
+
+app.use(cors(corsConfig))
+app.options('*', cors(corsConfig))
 app.use(express.json())
 
 
@@ -174,7 +182,7 @@ async function run() {
         const result = await userCollection.find(query).toArray()
         res.send(result)
       });
-      app.put('/users/admin/:email' , verifyToken , async(req , res)=>{
+      app.put('/users/admin/:email', async(req , res)=>{
         const email = req.params.email;
         const filter = {email : email};
         const updateDocs = {
