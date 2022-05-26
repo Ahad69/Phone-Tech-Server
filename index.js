@@ -17,9 +17,21 @@ const stripe = require('stripe')(process.env.STRIPE_KEY)
 // app.options('*', cors(corsConfig))
 
 // app.use(cors())
+// app.use(express.json())
+// app.use('*', cors())
+const corsConfig = {
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+}
+app.use(cors(corsConfig))
+app.options("*", cors(corsConfig))
 app.use(express.json())
-app.use('*', cors())
-
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept,authorization")
+  next()
+})
 
 
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.USER_PASS}@cluster0.sbmqf.mongodb.net/?retryWrites=true&w=majority`;
