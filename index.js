@@ -17,7 +17,7 @@ const stripe = require('stripe')(process.env.STRIPE_KEY)
 // app.options('*', cors(corsConfig))
 
 // app.use(cors({origin : 'https://assignment-12-42953.web.app'}))
-app.use(cors({}))
+app.use(cors())
 app.use(express.json())
 // app.use('*', cors())
 // const corsConfig = {
