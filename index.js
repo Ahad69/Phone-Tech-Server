@@ -4,6 +4,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const { response } = require('express');
 const ObjectId = require('mongodb').ObjectId;
 const port = process.env.PORT || 5000 ;
 const stripe = require('stripe')(process.env.STRIPE_KEY)
@@ -16,9 +17,11 @@ const stripe = require('stripe')(process.env.STRIPE_KEY)
 // app.use(cors(corsConfig))
 // app.options('*', cors(corsConfig))
 
-// app.use(cors({origin : 'https://assignment-12-42953.web.app'}))
-app.use(cors())
+app.use(cors({origin : 'https://assignment-12-42953.web.app' , optionsSuccessStatus: 200}))
+
+// app.use(cors())
 app.use(express.json())
+
 // app.use('*', cors())
 // const corsConfig = {
 //     origin: '*',
@@ -64,6 +67,8 @@ async function run() {
       const userCollection = client.db("phoneTech").collection("users");
       const paymentCollection = client.db("phoneTech").collection("payment");
      
+   
+
       // get products
       app.get('/products' , async(req, res)=>{
           const query = {};
@@ -241,7 +246,7 @@ async function run() {
       console.log('amount' , amount)
  
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount ,
+        amount: amount,
         currency: "usd",
         payment_method_types:['card'] 
       });
