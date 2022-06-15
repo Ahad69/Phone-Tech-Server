@@ -17,8 +17,12 @@ const stripe = require('stripe')(process.env.STRIPE_KEY)
 // app.use(cors(corsConfig))
 // app.options('*', cors(corsConfig))
 
-app.use(cors({origin : 'https://assignment-12-42953.web.app' , optionsSuccessStatus: 200}))
+// app.use(cors({origin : 'https://assignment-12-42953.web.app' , optionsSuccessStatus: 200}))
 
+var corsOptions = {
+  origin: 'https://assignment-12-42953.web.app',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
 // app.use(cors())
 app.use(express.json())
 
@@ -115,7 +119,7 @@ async function run() {
 
       // get orders by email 
   
-      app.get('/orders' , async(req,res)=>{
+      app.get('/orders' , cors(corsOptions) , async(req,res)=>{
         const customerEmail = req.query.customerEmail;
          const decodedEmail =  req.decoded.email;
          if(customerEmail == decodedEmail){
